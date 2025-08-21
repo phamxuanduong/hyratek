@@ -14,6 +14,8 @@ spec:
               revision: main
               directories:
                 - path: apps/*/beta
+                  values:
+                    app: '{{index .path.segments 1}}'
           # Chọn đúng cụm có env=beta
           - clusters:
               selector:
@@ -22,7 +24,7 @@ spec:
   template:
     metadata:
       # Tên app = <tên thư mục app>-beta
-      name: '{{.path.basename}}-beta'
+      name: '{{.values.app}}-beta'
     spec:
       project: default
       source:
@@ -33,7 +35,7 @@ spec:
           recurse: true
       destination:
         server: '{{.server}}'
-        namespace: '{{.path.basename}}'
+        namespace: '{{.values.app}}'
       syncPolicy:
         automated:
           prune: true
