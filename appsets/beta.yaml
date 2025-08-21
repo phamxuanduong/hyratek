@@ -8,29 +8,33 @@ spec:
   generators:
     - matrix:
         generators:
+          # Liệt kê các app có thư mục beta/
           - git:
               repoURL: https://github.com/phamxuanduong/hyratek.git
               revision: main
               directories:
                 - path: apps/*/beta
-                  values:
-                    app: '{{index .path.segments 1}}'   # "apache" lấy từ apps/apache/beta
+          # Chọn đúng cụm có env=beta
           - clusters:
               selector:
                 matchLabels:
                   env: beta
   template:
     metadata:
-      name: '{{.values.app}}-beta'
+      # Tên app = <tên thư mục app>-beta
+      name: '{{.path.basename}}-beta'
     spec:
       project: default
       source:
         repoURL: https://github.com/phamxuanduong/hyratek.git
         targetRevision: main
         path: '{{.path.path}}'
-        directory: { recurse: true }
+        directory:
+          recurse: true
       destination:
         server: '{{.server}}'
-        namespace: '{{.values.app}}'
+        namespace: '{{.path.basename}}'
       syncPolicy:
-        automated: { prune: true, selfHeal: true }
+        automated:
+          prune: true
+          selfHeal: true
