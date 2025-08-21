@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: beta
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - matrix:
+        generators:
+          # Liệt kê các app có thư mục beta/
+          - git:
+              repoURL: https://github.com/phamxuanduong/hyratek.git
+              revision: main
+              directories:
+                - path: apps/*/beta
+          # Chọn đúng cụm có env=beta
+          - clusters:
+              selector:
+                matchLabels:
+                  env: beta
+  template:
+    metadata:
+      # Tên app = <tên thư mục app>-beta
+      name: '{{.path.basename}}-beta'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/phamxuanduong/hyratek.git
+        targetRevision: main
+        path: '{{.path.path}}'
+        directory:
+          recurse: true
+      destination:
+        server: '{{.server}}'
+        namespace: '{{.path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
