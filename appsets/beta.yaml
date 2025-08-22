@@ -23,20 +23,6 @@ spec:
     metadata:
       # Tên app = <tên thư mục app>-beta
       name: '{{ index .path.segments 1 }}-beta'
-      annotations:
-        # lấy danh sách image từ file images.yaml
-        argocd-image-updater.argoproj.io/image-list: '{{ .imageList }}'
-
-        # dùng chiến lược newest-build (tên mới của 'latest')
-        argocd-image-updater.argoproj.io/update-strategy: newest-build
-
-        # chỉ xét các tag là số 1..10
-        argocd-image-updater.argoproj.io/allow-tags: '{{ .allowTags }}'
-
-        # ghi ngược về Git và sửa trực tiếp kustomization.yaml
-        argocd-image-updater.argoproj.io/write-back-method: git
-        argocd-image-updater.argoproj.io/write-back-target: kustomization
-        argocd-image-updater.argoproj.io/git-branch: main
     spec:
       project: default
       source:
