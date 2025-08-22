@@ -4,3 +4,7 @@ namespace: apache
 resources:
   - ns.yaml
   - deployment.yaml
+
+images:
+  - name: pxdvn/httpd
+    newTag: "1" 

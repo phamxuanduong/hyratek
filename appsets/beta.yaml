@@ -23,6 +23,18 @@ spec:
     metadata:
       # Tên app = <tên thư mục app>-beta
       name: '{{ index .path.segments 1 }}-beta'
+      annotations:
+        # Liệt kê image cần theo dõi (đặt alias = apache)
+        argocd-image-updater.argoproj.io/image-list: apache=pxdvn/httpd
+
+        # Tag của bạn là số tăng dần: dùng 'latest' theo thời gian tạo + lọc chỉ nhận tag số
+        argocd-image-updater.argoproj.io/apache.update-strategy: latest
+        argocd-image-updater.argoproj.io/apache.allow-tags: regexp:^\\d+$
+
+        # Ghi thay đổi về Git và nhắm vào kustomization.yaml
+        argocd-image-updater.argoproj.io/write-back-method: git
+        argocd-image-updater.argoproj.io/git-branch: main
+        argocd-image-updater.argoproj.io/write-back-target: kustomization
     spec:
       project: default
       source:
