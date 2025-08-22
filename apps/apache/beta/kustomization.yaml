@@ -4,7 +4,8 @@ namespace: apache
 resources:
   - ns.yaml
   - deployment.yaml
-
 images:
   - name: pxdvn/httpd
-    newTag: "1" 
+    newTag: "1"
+  - name: docker.io/pxdvn/httpd
+    newTag: "2"
