@@ -4,3 +4,8 @@ namespace: apache
 resources:
   - ns.yaml
   - deployment.yaml
+
+images:
+  - name: pxdvn/httpd
+    newName: pxdvn/httpd
+    newTag: "1"   # ban đầu là 1; AIU sẽ đổi 2,3,...,10
