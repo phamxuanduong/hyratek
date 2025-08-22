@@ -29,8 +29,8 @@ spec:
         repoURL: https://github.com/phamxuanduong/hyratek.git
         targetRevision: main
         path: '{{.path.path}}'
-        directory:
-          recurse: true
+#        directory:
+#          recurse: true
       destination:
         server: '{{.server}}'
         namespace: '{{ index .path.segments 1 }}'
