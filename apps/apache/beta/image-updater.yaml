@@ -1,7 +1,1 @@
-alias: apache                      # tên alias để tham chiếu trong annotation
-image: pxdvn/httpd       # tên image (FQDN để kustomize match)
-allowTags: 'regexp:^[0-9]+$'       # chỉ nhận tag số
-updateStrategy: newest-build       # tên mới thay 'latest'
-writeBackMethod: git
-writeBackTarget: kustomization
-gitBranch: main
+image_list: "apache=pxdvn/httpd"

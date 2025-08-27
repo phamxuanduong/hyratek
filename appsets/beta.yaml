@@ -24,7 +24,7 @@ spec:
       # Tên app = <tên thư mục app>-beta
       name: '{{ index .path.segments 1 }}-beta'
       annotations:
-        argocd-image-updater.argoproj.io/image-list: apache=pxdvn/httpd
+        argocd-image-updater.argoproj.io/image-list: '{{ .image_list }}'
         # Đổi latest -> newest-build (tên mới)
         argocd-image-updater.argoproj.io/apache.update-strategy: newest-build
         # Regex chỉ nhận tag toàn số, dùng [0-9]+ để khỏi dính lỗi escape
