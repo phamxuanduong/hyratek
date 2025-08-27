@@ -8,47 +8,40 @@ spec:
   generators:
     - matrix:
         generators:
-          # Liệt kê các app có thư mục beta/
           - git:
               repoURL: https://github.com/phamxuanduong/hyratek.git
               revision: main
-              directories:
-                - path: apps/*/beta
-          # Chọn đúng cụm có env=beta
+              files:
+                # Look for image config files in any app's beta folder
+                - path: "apps/*/beta/image-config.json"
           - clusters:
               selector:
                 matchLabels:
                   env: beta
+
   template:
     metadata:
-      # Tên app = <tên thư mục app>-beta
-      name: '{{ index .path.segments 1 }}-beta'
+      name: '{{ index .path.segments 1 }}-beta'  # e.g. "apache-beta"
       annotations:
-        argocd-image-updater.argoproj.io/image-list: pxdvn/httpd
-        # Đổi latest -> newest-build (tên mới)
-        argocd-image-updater.argoproj.io/apache.update-strategy: newest-build
-        # Regex chỉ nhận tag toàn số, dùng [0-9]+ để khỏi dính lỗi escape
-        argocd-image-updater.argoproj.io/apache.allow-tags: 'regexp:^[0-9]+$'
-
-        # Ghi ngược về Git vào kustomization.yaml trên nhánh main
+        # Use the values from each app's config file:
+        argocd-image-updater.argoproj.io/image-list: '{{ .imageAlias }}={{ .imagePath }}'
+        argocd-image-updater.argoproj.io/{{ .imageAlias }}.update-strategy: '{{ .updateStrategy }}'
+        argocd-image-updater.argoproj.io/{{ .imageAlias }}.allow-tags: '{{ .allowTags }}'
+        # Global settings (same for all apps) can remain hard-coded:
         argocd-image-updater.argoproj.io/write-back-method: git
         argocd-image-updater.argoproj.io/write-back-target: kustomization
         argocd-image-updater.argoproj.io/git-branch: main
-
-        # (Tạm thời) ép update 1 lần để “kéo” trạng thái ban đầu
-        argocd-image-updater.argoproj.io/apache.force-update: "true"
     spec:
       project: default
       source:
         repoURL: https://github.com/phamxuanduong/hyratek.git
         targetRevision: main
-        path: '{{.path.path}}'
-#        directory:
-#          recurse: true
+        path: '{{ .path.path }}'           # path to the app's beta folder
       destination:
-        server: '{{.server}}'
-        namespace: '{{ index .path.segments 1 }}'
+        server: '{{ .server }}'
+        namespace: '{{ index .path.segments 1 }}'   # use app name as namespace
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
+
