@@ -6,4 +6,4 @@ resources:
   - deployment.yaml
 images:
   - name: pxdvn/httpd
-    newTag: "2"
+    newTag: "3"
