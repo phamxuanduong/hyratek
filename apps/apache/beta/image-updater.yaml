@@ -1,1 +1,3 @@
-image_list: "apache=pxdvn/httpd"
+imageUpdater:
+  alias: apache
+  image: pxdvn/httpd

@@ -12,8 +12,15 @@ spec:
           - git:
               repoURL: https://github.com/phamxuanduong/hyratek.git
               revision: main
+              pathParamPrefix: dir
               directories:
                 - path: apps/*/beta
+          - git:                           # 2) files: image-updater.yaml
+              repoURL: https://github.com/phamxuanduong/hyratek.git
+              revision: main
+              pathParamPrefix: file
+              files:
+                - path: apps/*/beta/image-updater.yaml
           # Chọn đúng cụm có env=beta
           - clusters:
               selector:
@@ -22,9 +29,9 @@ spec:
   template:
     metadata:
       # Tên app = <tên thư mục app>-beta
-      name: '{{ index .path.segments 1 }}-beta'
+      name: '{{ index .dir.path.segments 1 }}-beta'
       annotations:
-        argocd-image-updater.argoproj.io/image-list: pxdvn/httpd
+        argocd-image-updater.argoproj.io/image-list: '{{ .imageUpdater.alias }}={{ .imageUpdater.image }}'
         # Đổi latest -> newest-build (tên mới)
         argocd-image-updater.argoproj.io/apache.update-strategy: newest-build
         # Regex chỉ nhận tag toàn số, dùng [0-9]+ để khỏi dính lỗi escape
@@ -42,12 +49,12 @@ spec:
       source:
         repoURL: https://github.com/phamxuanduong/hyratek.git
         targetRevision: main
-        path: '{{.path.path}}'
+        path: '{{ .dir.path.path }}'
 #        directory:
 #          recurse: true
       destination:
         server: '{{.server}}'
-        namespace: '{{ index .path.segments 1 }}'
+        namespace: '{{ index .dir.path.segments 1 }}'
       syncPolicy:
         automated:
           prune: true
