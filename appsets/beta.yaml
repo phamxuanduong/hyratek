@@ -6,55 +6,48 @@ metadata:
 spec:
   goTemplate: true
   generators:
-    - merge:
-        mergeKeys:
-          - values.appName              # khoá chung để ghép hai nhánh
+    - matrix:
         generators:
-          # Nhánh 1: matrix (directories x clusters)
-          - matrix:
-              generators:
-                - git:
-                    repoURL: https://github.com/phamxuanduong/hyratek.git
-                    revision: main
-                    pathParamPrefix: src
-                    directories:
-                      - path: apps/*/beta
-                    values:
-                      # trích tên app từ "apps/<app>/beta"
-                      appName: '{{ index .path.segments 1 }}'     # <- khoá merge
-                - clusters:
-                    selector:
-                      matchLabels:
-                        env: beta
-          # Nhánh 2: files (đọc cấu hình per-app)
+          # Liệt kê các app có thư mục beta/
           - git:
               repoURL: https://github.com/phamxuanduong/hyratek.git
               revision: main
-              pathParamPrefix: cfg
-              files:
-                - path: apps/*/beta/image-updater.yaml            # mẫu rõ ràng, tránh glob "háu đói"
-              values:
-                appName: '{{ index .path.segments 1 }}'           # <- cùng khoá merge
+              directories:
+                - path: apps/*/beta
+          # Chọn đúng cụm có env=beta
+          - clusters:
+              selector:
+                matchLabels:
+                  env: beta
   template:
     metadata:
-      name: '{{ .values.appName }}-beta'
+      # Tên app = <tên thư mục app>-beta
+      name: '{{ index .path.segments 1 }}-beta'
       annotations:
-        # Các annotation bên dưới đến từ file cấu hình per-app
-        argocd-image-updater.argoproj.io/image-list: '{{ .alias }}={{ .image }}'
-        argocd-image-updater.argoproj.io/{{ .alias }}.update-strategy: '{{ .updateStrategy }}'
-        argocd-image-updater.argoproj.io/{{ .alias }}.allow-tags: '{{ .allowTags }}'
-        argocd-image-updater.argoproj.io/write-back-method: '{{ .writeBackMethod }}'
-        argocd-image-updater.argoproj.io/write-back-target: '{{ .writeBackTarget }}'
-        argocd-image-updater.argoproj.io/git-branch: '{{ .gitBranch }}'
+        argocd-image-updater.argoproj.io/image-list: apache=pxdvn/httpd
+        # Đổi latest -> newest-build (tên mới)
+        argocd-image-updater.argoproj.io/apache.update-strategy: newest-build
+        # Regex chỉ nhận tag toàn số, dùng [0-9]+ để khỏi dính lỗi escape
+        argocd-image-updater.argoproj.io/apache.allow-tags: 'regexp:^[0-9]+$'
+
+        # Ghi ngược về Git vào kustomization.yaml trên nhánh main
+        argocd-image-updater.argoproj.io/write-back-method: git
+        argocd-image-updater.argoproj.io/write-back-target: kustomization
+        argocd-image-updater.argoproj.io/git-branch: main
+
+        # (Tạm thời) ép update 1 lần để “kéo” trạng thái ban đầu
+        argocd-image-updater.argoproj.io/apache.force-update: "true"
     spec:
       project: default
       source:
         repoURL: https://github.com/phamxuanduong/hyratek.git
         targetRevision: main
-        path: '{{ .src.path.path }}'   # lấy đường dẫn app từ nhánh "directories"
+        path: '{{.path.path}}'
+#        directory:
+#          recurse: true
       destination:
-        server: '{{ .server }}'        # lấy cụm đích từ nhánh "clusters"
-        namespace: '{{ .values.appName }}'
+        server: '{{.server}}'
+        namespace: '{{ index .path.segments 1 }}'
       syncPolicy:
         automated:
           prune: true
