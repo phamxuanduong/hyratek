@@ -7,3 +7,5 @@ resources:
 images:
   - name: pxdvn/httpd
     newTag: "3"
+  - name: pxdvn/nginx
+    newTag: "2"
