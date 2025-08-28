@@ -6,4 +6,4 @@ resources:
   - deployment.yaml
 images:
   - name: pxdvn/nginx
-    newTag: "1"
+    newTag: "2"
