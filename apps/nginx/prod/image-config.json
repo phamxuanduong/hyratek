@@ -1,0 +1,6 @@
+{
+  "imageAlias": "nginx",
+  "imagePath": "pxdvn/nginx",
+  "updateStrategy": "newest-build",
+  "allowTags": "regexp:^[0-9]+$"
+}

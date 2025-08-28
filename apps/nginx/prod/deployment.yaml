@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-prod
+  namespace: nginx-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-prod
+  template:
+    metadata:
+      labels:
+        app: nginx-prod
+    spec:
+      containers:
+        - name: nginx-prod
+          image: pxdvn/nginx:1
+          ports:
+            - containerPort: 80
+              protocol: TCP

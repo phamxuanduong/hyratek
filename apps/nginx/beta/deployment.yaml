@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-beta
+  namespace: nginx-beta
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-beta
+  template:
+    metadata:
+      labels:
+        app: nginx-beta
+    spec:
+      containers:
+        - name: nginx-beta
+          image: pxdvn/nginx:1
+          ports:
+            - containerPort: 80
+              protocol: TCP
