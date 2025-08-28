@@ -1,0 +1,6 @@
+{
+  "imageAlias": "apache",
+  "imagePath": "pxdvn/httpd",
+  "updateStrategy": "newest-build",
+  "allowTags": "regexp:^[0-9]+$"
+}
